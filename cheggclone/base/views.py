@@ -3,13 +3,13 @@ from .models import Room
 from .forms import RoomForm
 
 
-def home(request:str):
+def home(request:object):
     rooms = Room.objects.all()
     context = {'rooms':rooms}
     return render(request,'base/home.html',context)
 
 
-def room(request:str,pk:str):
+def room(request:object,pk:str):
     room = Room.objects.get(id = pk)
     
     context = {'room':room}
@@ -17,7 +17,7 @@ def room(request:str,pk:str):
     return render(request,'base/room.html',context)
 
 
-def create_room(request:str):
+def create_room(request:object):
     form = RoomForm()
     if request.method == 'POST':
         form = RoomForm(request.POST)
@@ -29,7 +29,7 @@ def create_room(request:str):
     return render(request,'base/room_form.html',context)
 
 
-def update_room(request:str, pk:str):
+def update_room(request:object, pk:str):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room)
     
@@ -41,3 +41,11 @@ def update_room(request:str, pk:str):
     
     context = {'form':form}
     return render(request,'base/room_form.html',context)
+
+
+def delete_room(request:object,pk:str):
+    room = Room.objects.get(id=pk)
+    if request.method == 'POST':
+        room.delete()
+        return redirect('home')
+    return render(request,'base/delete.html',{'obj':room})
