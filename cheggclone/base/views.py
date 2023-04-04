@@ -82,6 +82,7 @@ def room(request:object,pk:str):
             room = room,
             body = request.POST.get('body')
         )
+        room.participants.add(request.user)
         return redirect('room',pk=room.id)
     
     context = {'room':room, 'room_messages':room_messages,'participants':participants}            
@@ -122,10 +123,24 @@ def update_room(request:object, pk:str):
 @login_required(login_url='login')
 def delete_room(request:object,pk:str):
     room = Room.objects.get(id=pk)
-    if request.User != room.user:
+    if request.user != room.user:
         return HttpResponse('Invalid credentials to execute requested action!!')
     
     if request.method == 'POST':
         room.delete()
         return redirect('home')
     return render(request,'base/delete.html',{'obj':room})
+
+
+
+@login_required(login_url='login')
+def delete_message(request:object,pk:str):
+    room_message = Message.objects.get(id=pk)
+    if request.user != room_message.user:
+        return HttpResponse('Invalid credentials to execute requested action!!')
+    
+    if request.method == 'POST':
+        room_message.delete()
+        return redirect('home')
+    return render(request,'base/delete.html',{'obj':room_message})
+
