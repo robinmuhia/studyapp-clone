@@ -5,9 +5,14 @@ from django.contrib.auth.models import User
 from .forms import RoomForm
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
 
 def login_page(request:object):
+    if request.user.is_authenticated:
+        return redirect('home')
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -53,6 +58,7 @@ def room(request:object,pk:str):
     return render(request,'base/room.html',context)
 
 
+@login_required(login_url='login')
 def create_room(request:object):
     form = RoomForm()
     if request.method == 'POST':
@@ -65,9 +71,13 @@ def create_room(request:object):
     return render(request,'base/room_form.html',context)
 
 
+@login_required(login_url='login')
 def update_room(request:object, pk:str):
     room = Room.objects.get(id=pk)
     form = RoomForm(instance=room)
+    
+    if request.user != room.host:
+        return HttpResponse('Invalid credentials to execute requested action!!')
     
     if request.method == "POST":
         form = RoomForm(request.POST, instance=room)
@@ -79,8 +89,12 @@ def update_room(request:object, pk:str):
     return render(request,'base/room_form.html',context)
 
 
+@login_required(login_url='login')
 def delete_room(request:object,pk:str):
     room = Room.objects.get(id=pk)
+    if request.User != room.user:
+        return HttpResponse('Invalid credentials to execute requested action!!')
+    
     if request.method == 'POST':
         room.delete()
         return redirect('home')
