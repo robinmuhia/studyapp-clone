@@ -6,6 +6,7 @@ from .forms import RoomForm
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 
+
 def login_page(request:object):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -25,6 +26,10 @@ def login_page(request:object):
     context ={}
     return render(request,'base/login_register.html',context)    
     
+
+def logout_user(request:object):
+    logout(request)
+    return redirect('home')
     
     
 def home(request:object):
