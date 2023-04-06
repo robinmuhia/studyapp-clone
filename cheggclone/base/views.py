@@ -135,7 +135,7 @@ def update_room(request:object, pk:str):
 @login_required(login_url='login')
 def delete_room(request:object,pk:str):
     room = Room.objects.get(id=pk)
-    if request.user != room.user:
+    if request.user != room.host:
         return HttpResponse('Invalid credentials to execute requested action!!')
     
     if request.method == 'POST':
